@@ -16,32 +16,26 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v2
       with:
-        username: ${{ prajapati003 }}
-        password: ${{ dockerhub }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build & Push Docker image
       run: |
-        docker build -t Deepuprajpat/backnd:latest .
-        docker push Deepuprajapat/backnd:latest
+        docker build -t Deepuprajapat/deepak_backnd:latest .
+        docker push Deepuprajapat/deepak_backnd:latest
 
     - name: Debug Host
-      run: echo "Host is ${{ 54.146.240.40 }}" #To check if the secret is set correctly
+      run: echo "Host is ${{ secrets.EC2_HOST }}" #To check if the secret is set correctly
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ 54.146.240.40 }}
-        username: ${{ ubuntu }}
-        key: ${{ -----BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-QyNTUxOQAAACCFo8EW/vlSr4e5p3JX2ySG+0M/TX2XO0NgdtfpOeoorgAAAKDCXnLmwl5y
-5gAAAAtzc2gtZWQyNTUxOQAAACCFo8EW/vlSr4e5p3JX2ySG+0M/TX2XO0NgdtfpOeoorg
-AAAEBO+kE5QpcQS9bYCVdf98++ks8Rjr17pQo/gNBE5bRDx4WjwRb++VKvh7mnclfbJIb7
-Qz9NfZc7Q2B21+k56iiuAAAAFnVidW50dUBpcC0xNzItMzEtODQtOTYBAgMEBQYH
------END OPENSSH PRIVATE KEY----- }}
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
         script: |
-          docker login -u ${{ prajapatideepu003@gmail.com }} -p ${{ dockerhub }}
-          docker pull Deepuprajapat/backnd:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker pull Deepuprajapat/deepak_backnd:latest
           docker stop backnd || true
           docker rm backnd || true
-          docker run -d --name bma -p 3000:80 Deepuprajapat/backnd:latest
+          docker run -d --name backnd -p 3000:80 Deepuprajapat/deepakbacknd:latest
