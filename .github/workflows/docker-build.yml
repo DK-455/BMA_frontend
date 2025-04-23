@@ -21,8 +21,8 @@ jobs:
 
     - name: Build & Push Docker image
       run: |
-        docker build -t Deepuprajapat/bnd:latest .
-        docker push Deepuprajapat/bnd:latest
+        docker build -t prajapati003/deepak-backand:latest .
+        docker push prajapati003/deepak-backand:latest
 
     - name: Debug Host
       run: echo "Host is ${{ secrets.EC2_HOST }}" #To check if the secret is set correctly
@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         script: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker pull Deepuprajapat/bnd:latest
-          docker stop bnd || true
-          docker rm bnd || true
-          docker run -d --name bnd -p 3000:80 Deepuprajapat/bnd:latest
+          docker pull prajapati003/deepak-backand:latest
+          docker stop new_con || true
+          docker rm new_con || true
+          docker run -d --name new_con -p 3000:80 prajapati003/deepak-backand:latest
