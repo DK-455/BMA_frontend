@@ -57,8 +57,8 @@ jobs:
           sudo docker pull prajapati003/deepak-backand:latest
           
           # Stop and remove the existing container if it exists
-          sudo docker stop new_con || true
-          sudo docker rm new_con || true
+          # sudo docker stop new_con || true
+          # sudo docker rm new_con || true
           
           # Run the new container
           sudo docker run -d --name new_con -p 3000:80 prajapati003/deepak-backand:latest
