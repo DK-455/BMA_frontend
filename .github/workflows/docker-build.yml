@@ -61,4 +61,4 @@ jobs:
           # sudo docker rm new_con || true
           
           # Run the new container
-          sudo docker run -d --name new_con -p 3000:80 prajapati003/deepak-backand:latest
+          sudo docker run -d --name new_con -p 3000:3000 prajapati003/deepak-backand:latest
