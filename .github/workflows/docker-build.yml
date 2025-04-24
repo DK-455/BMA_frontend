@@ -51,14 +51,14 @@ jobs:
         debug: true
         script: |
           # Docker login on the EC2 instance
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           
           # Pull the latest image from DockerHub
-          docker pull prajapati003/deepak-backand:latest
+          sudo docker pull prajapati003/deepak-backand:latest
           
           # Stop and remove the existing container if it exists
-          docker stop new_con || true
-          docker rm new_con || true
+          sudo docker stop new_con || true
+          sudo docker rm new_con || true
           
           # Run the new container
-          docker run -d --name new_con -p 3000:80 prajapati003/deepak-backand:latest
+          sudo docker run -d --name new_con -p 3000:80 prajapati003/deepak-backand:latest
