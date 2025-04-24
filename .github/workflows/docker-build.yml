@@ -45,7 +45,7 @@ jobs:
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}           # EC2 Host
-        username: ubuntu                        # EC2 Username
+        username: ${{ secrets.EC2_USER }}       # EC2 Username
         key: ${{ secrets.EC2_KEY }}             # EC2 Private SSH Key
         port: 22
         debug: true
