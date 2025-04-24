@@ -27,6 +27,15 @@ jobs:
         docker build -t prajapati003/deepak-backand:latest .
         docker push prajapati003/deepak-backand:latest
 
+     # Step to test if GitHub runner can reach EC2
+    - name: Test network connectivity to EC2
+      run: |
+        echo "Pinging EC2 instance..."
+        ping -c 3 ${{ secrets.EC2_HOST }} || true
+
+        echo "Checking SSH port..."
+        nc -zv ${{ secrets.EC2_HOST }} 22 || true
+
     # Step to debug and check if EC2_HOST secret is set correctly
     - name: Debug Host
       run: echo "Host is ${{ secrets.EC2_HOST }}"  # To check if the secret is set correctly
