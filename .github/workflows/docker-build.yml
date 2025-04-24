@@ -60,5 +60,5 @@ jobs:
           sudo docker run -d --name con1 -p 3000:80 prajapati003/deepak-backand:latest
 
           # Stop and remove the existing container if it exists
-          sudo docker stop con1 || true
+          # sudo docker stop con1 || true
           sudo docker start con1 || true
