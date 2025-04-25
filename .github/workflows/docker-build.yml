@@ -57,8 +57,8 @@ jobs:
           sudo docker pull prajapati003/deepak-backand:latest
           
           # Run the new container
-          sudo docker run -d --name docker -p 3000:80 prajapati003/deepak-backand:latest
+          sudo docker run -d --name frontend-con -p 3000:80 prajapati003/deepak-backand:latest
 
           # Stop and remove the existing container if it exists
-          # sudo docker stop con1 || true
-          sudo docker start con1 || true
+          # sudo docker stop frontend-con || true
+          sudo docker start frontend-con || true
