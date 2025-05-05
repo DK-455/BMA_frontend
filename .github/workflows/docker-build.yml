@@ -19,7 +19,7 @@ jobs:
       - name: Build & Push Docker image to Private Registry
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: bma/frontend
+          image: invest730/bmaserver
           tags: ${{ github.sha }}
           registry: invest.virtualintelligence.co.in
           dockerfile: Dockerfile
@@ -57,10 +57,10 @@ jobs:
             sudo docker rm frontend-con || true
 
             # Pull the latest image with commit SHA
-            sudo docker pull invest.virtualintelligence.co.in/bma/frontend:${{ github.sha }}
+            sudo docker pull invest.virtualintelligence.co.ininvest730/bmaserver:${{ github.sha }}
 
             # Run the new container
-            sudo docker run -d --name frontend-con -p 3000:3000 invest.virtualintelligence.co.in/bma/frontend:${{ github.sha }}
+            sudo docker run -d --name frontend-con -p 3000:3000 invest.virtualintelligence.co.ininvest730/bmaserver:${{ github.sha }}
 
             # Wait and check logs
             sleep 5
