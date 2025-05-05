@@ -51,7 +51,8 @@ jobs:
         debug: true
         script: |
           # Login to Docker
-          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          Secure Docker login using --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
           # Stop and remove old container if exists
           sudo docker stop frontend-con || true
