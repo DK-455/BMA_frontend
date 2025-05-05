@@ -19,7 +19,7 @@ jobs:
       - name: Build & Push Docker image to Private Registry
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: prajapati003/deepak-backand
+          image: bma/frontend
           tags: ${{ github.sha }}
           registry: invest.virtualintelligence.co.in
           dockerfile: Dockerfile
