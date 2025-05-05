@@ -1,70 +1,67 @@
-name: Deploy React App to EC2 via Docker
+name: Build and Deploy React App to EC2 via Docker
 
 on:
   push:
     branches:
       - main
+      - master
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # Step to checkout the code from the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Step to login to DockerHub
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      # Step 2: Build and Push Docker Image to Private Registry
+      - name: Build & Push Docker image to Private Registry
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: bma/frontend
+          tags: ${{ github.sha }}
+          registry: invest.virtualintelligence.co.in
+          dockerfile: Dockerfile.dev
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    # Step to build the Docker image and push it to DockerHub
-    - name: Build & Push Docker image
-      run: |
-        docker build -t prajapati003/deepak-backand:latest .
-        docker push prajapati003/deepak-backand:latest
+      # Step 3: Test network connectivity to EC2
+      - name: Test network connectivity to EC2
+        run: |
+          echo "Pinging EC2 instance..."
+          ping -c 3 ${{ secrets.EC2_HOST }} || true
 
-     # Step to test if GitHub runner can reach EC2
-    - name: Test network connectivity to EC2
-      run: |
-        echo "Pinging EC2 instance..."
-        ping -c 3 ${{ secrets.EC2_HOST }} || true
+          echo "Checking SSH port..."
+          nc -zv ${{ secrets.EC2_HOST }} 22 || true
 
-        echo "Checking SSH port..."
-        nc -zv ${{ secrets.EC2_HOST }} 22 || true
+      # Step 4: Debug EC2 Host
+      - name: Debug Host
+        run: echo "Host is ${{ secrets.EC2_HOST }}"
 
-    # Step to debug and check if EC2_HOST secret is set correctly
-    - name: Debug Host
-      run: echo "Host is ${{ secrets.EC2_HOST }}"  # To check if the secret is set correctly
+      # Step 5: Deploy to EC2 over SSH
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          debug: true
+          script: |
+            # Login to private Docker registry
+            sudo docker login invest.virtualintelligence.co.in -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
 
-        # Step to deploy on EC2 instance using SSH
-    - name: Deploy on EC2
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}           # EC2 Host
-        username: ${{ secrets.EC2_USER }}       # EC2 Username
-        key: ${{ secrets.EC2_KEY }}             # EC2 Private SSH Key
-        port: 22
-        debug: true
-        script: |
-          # Login to Docker
-          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            # Stop and remove old container if it exists
+            sudo docker stop frontend-con || true
+            sudo docker rm frontend-con || true
 
-          # Stop and remove old container if exists
-          sudo docker stop frontend-con || true
-          sudo docker rm frontend-con || true
+            # Pull the latest image with commit SHA
+            sudo docker pull invest.virtualintelligence.co.in/bma/frontend:${{ github.sha }}
 
-          # Pull latest image
-          sudo docker pull prajapati003/deepak-backand:latest
+            # Run the new container
+            sudo docker run -d --name frontend-con -p 3000:3000 invest.virtualintelligence.co.in/bma/frontend:${{ github.sha }}
 
-          # Run a new container
-          sudo docker run -d --name frontend-con -p 3000:3000 prajapati003/deepak-backand:latest
-
-          # Wait a few seconds to ensure container starts
-          sleep 5
-
-          # Print logs of the new container
-          sudo docker logs frontend-con
+            # Wait and check logs
+            sleep 5
+            sudo docker logs frontend-con
