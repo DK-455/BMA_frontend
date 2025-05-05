@@ -1,67 +1,70 @@
-name: Build and Deploy React App to EC2 via Docker
+name: Deploy React App to EC2 via Docker
 
 on:
   push:
     branches:
       - main
-      - master
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # Step to checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Step 2: Build and Push Docker Image to Private Registry
-      - name: Build & Push Docker image to Private Registry
-        uses: mr-smithers-excellent/docker-build-push@v6
-        with:
-          image: invest730/bmaserver
-          tags: ${{ github.sha }}
-          registry: invest.virtualintelligence.co.in
-          dockerfile: Dockerfile
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+    # Step to login to DockerHub
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 3: Test network connectivity to EC2
-      - name: Test network connectivity to EC2
-        run: |
-          echo "Pinging EC2 instance..."
-          ping -c 3 ${{ secrets.EC2_HOST }} || true
+    # Step to build the Docker image and push it to DockerHub
+    - name: Build & Push Docker image
+      run: |
+        docker build -t invest730/bmaserver:latest .
+        docker push invest730/bmaserver:latest
 
-          echo "Checking SSH port..."
-          nc -zv ${{ secrets.EC2_HOST }} 22 || true
+     # Step to test if GitHub runner can reach EC2
+    - name: Test network connectivity to EC2
+      run: |
+        echo "Pinging EC2 instance..."
+        ping -c 3 ${{ secrets.EC2_HOST }} || true
 
-      # Step 4: Debug EC2 Host
-      - name: Debug Host
-        run: echo "Host is ${{ secrets.EC2_HOST }}"
+        echo "Checking SSH port..."
+        nc -zv ${{ secrets.EC2_HOST }} 22 || true
 
-      # Step 5: Deploy to EC2 over SSH
-      - name: Deploy on EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          debug: true
-          script: |
-            # Login to private Docker registry
-            sudo docker login invest.virtualintelligence.co.in -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+    # Step to debug and check if EC2_HOST secret is set correctly
+    - name: Debug Host
+      run: echo "Host is ${{ secrets.EC2_HOST }}"  # To check if the secret is set correctly
 
-            # Stop and remove old container if it exists
-            sudo docker stop frontend-con || true
-            sudo docker rm frontend-con || true
+   # Step to deploy on EC2 instance using SSH
+    - name: Deploy on EC2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}           # EC2 Host
+        username: ${{ secrets.EC2_USER }}       # EC2 Username
+        key: ${{ secrets.EC2_KEY }}             # EC2 Private SSH Key
+        port: 22
+        debug: true
+        script: |
+          # Login to Docker
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-            # Pull the latest image with commit SHA
-            sudo docker pull invest.virtualintelligence.co.ininvest730/bmaserver:${{ github.sha }}
+          # Stop and remove old container if exists
+          sudo docker stop frontend-con || true
+          sudo docker rm frontend-con || true
 
-            # Run the new container
-            sudo docker run -d --name frontend-con -p 3000:3000 invest.virtualintelligence.co.ininvest730/bmaserver:${{ github.sha }}
+          # Pull latest image
+          sudo docker pull invest730/bmaserver:latest
 
-            # Wait and check logs
-            sleep 5
-            sudo docker logs frontend-con
+          # Run a new container
+          sudo docker run -d --name frontend-con -p 3000:3000 invest730/bmaserver:latest
+
+          # Wait a few seconds to ensure container starts
+          sleep 5
+
+          # Print logs of the new container
+          sudo docker logs frontend-con
