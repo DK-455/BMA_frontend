@@ -40,7 +40,7 @@ jobs:
     - name: Debug Host
       run: echo "Host is ${{ secrets.EC2_HOST }}"  # To check if the secret is set correctly
 
-    # Step to deploy on EC2 instance using SSH
+        # Step to deploy on EC2 instance using SSH
     - name: Deploy on EC2
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -50,15 +50,21 @@ jobs:
         port: 22
         debug: true
         script: |
-          # Docker login on the EC2 instance
+          # Login to Docker
           sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          
-          # Pull the latest image from DockerHub
-          sudo docker pull prajapati003/deepak-backand:latest
-          
-          # Run the new container
-          #sudo docker run -d --name frontend-con -p 3000:3000 prajapati003/deepak-backand:latest
 
-          # Stop and remove the existing container if it exists
-          # sudo docker stop frontend-con || true
-          sudo docker start frontend-con || true
+          # Stop and remove old container if exists
+          sudo docker stop frontend-con || true
+          sudo docker rm frontend-con || true
+
+          # Pull latest image
+          sudo docker pull prajapati003/deepak-backand:latest
+
+          # Run a new container
+          sudo docker run -d --name frontend-con -p 3000:3000 prajapati003/deepak-backand:latest
+
+          # Wait a few seconds to ensure container starts
+          sleep 5
+
+          # Print logs of the new container
+          sudo docker logs frontend-con
