@@ -22,7 +22,7 @@ jobs:
           image: bma/frontend
           tags: ${{ github.sha }}
           registry: invest.virtualintelligence.co.in
-          dockerfile: Dockerfile.dev
+          dockerfile: Dockerfile
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
