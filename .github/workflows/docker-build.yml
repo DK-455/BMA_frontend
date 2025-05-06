@@ -18,7 +18,7 @@ jobs:
         with:
           image: prajapati003/deepak-backand
           tags: latest
-          registry: bma.virtualintelligence.co.in
+          registry: bma.virtualintelligence.co.in:5000
           dockerfile: Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
