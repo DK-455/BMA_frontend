@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Log in to GHCR
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u deepuprajapati --password-stdin
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker image
         run: docker build -f Dockerfile -t ghcr.io/deepuprajapati/deepak-frontend:latest .
