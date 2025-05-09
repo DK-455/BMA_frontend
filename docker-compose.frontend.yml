@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   frontend:
-    image: ghcr.io/vi-im/bma-frontend:latest
-    container_name: bma-frontend
+    image: ghcr.io/deepakprajapati/deepak-frontend:latest
+    container_name: deepak-frontend
     ports:
       - "3000:3000"
     restart: always
