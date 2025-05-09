@@ -15,10 +15,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Log in to GHCR
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u Deepuprajapati --password-stdin
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u deepuprajapati --password-stdin
 
       - name: Build Docker image
-        run: docker build -f Dockerfile -t ghcr.io/Deepuprajapati/deepak-frontend:latest .
+        run: docker build -f Dockerfile -t ghcr.io/deepuprajapati/deepak-frontend:latest .
 
       - name: Push Docker image
-        run: docker push ghcr.io/Deepuprajapati/deepak-frontend:latest
+        run: docker push ghcr.io/deepuprajapati/deepak-frontend:latest
