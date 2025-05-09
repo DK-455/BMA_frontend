@@ -1,4 +1,4 @@
-name: Build and Deploy Docker Image
+name: Build, Push and Deploy Docker Image
 
 on:
   push:
@@ -9,35 +9,16 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
-      - name: Build & Push Docker image
-        uses: mr-smithers-excellent/docker-build-push@v6
-        with:
-          image: prajapati003/deepak-backand
-          tags: latest
-          registry: bma.virtualintelligence.co.in
-          dockerfile: Dockerfile
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          addLatest: false
-          addTimestamp: false
-          enableBuildKit: false
-          multiPlatform: false
-          overrideDriver: false
-          pushImage: true
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            sudo docker login bma.virtualintelligence.co.in -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker pull bma.virtualintelligence.co.in/prajapati003/deepak-backand:latest
-            #docker stop bmaserver || true
-            #docker rm bmaserver || true
-            sudo docker run -d --name front-conatiner -p 3000:3000 bma.virtualintelligence.co.in/prajapati003/deepak-backand:latest
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u Deepuprajapati --password-stdin
+
+      - name: Build Docker image
+        run: docker build -f Dockerfile -t ghcr.io/Deepuprajapati/deepak-frontend:latest .
+
+      - name: Push Docker image
+        run: docker push ghcr.io/Deepuprajapati/deepak-frontend:latest
