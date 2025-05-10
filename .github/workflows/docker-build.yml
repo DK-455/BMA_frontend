@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # ya 'master' ya jo bhi teri default branch hai
+      - main  # ya 'master' ya jo bhi default branch hai
 
 permissions:
   contents: read
@@ -24,8 +24,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t prajapati003/deepak-frontend:latest .
+          docker build -t prajapati003/invest-bma:latest .
 
       - name: Push Docker image
         run: |
-          docker push prajapati003/deepak-frontend:latest
+          docker push prajapati003/invest-bma:latest
