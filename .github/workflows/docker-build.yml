@@ -21,5 +21,5 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t ghcr.io/deepuprajapati/deepak-frontend:latest .
-        docker push ghcr.io/deepuprajapati/deepak-frontend:latest
+        docker build -t ghcr.io/deepuprajapati/frontend:latest .
+        docker push ghcr.io/deepuprajapati/frontend:latest
