@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # Ya jo bhi tera default branch ho
+      - main  # Apni default branch ka naam yaha daal
 
 jobs:
   build-and-push:
@@ -16,10 +16,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to GitHub Container Registry
-      run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Log in to GitHub Container Registry (GHCR)
+      run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u deepuprajapati --password-stdin
 
-    - name: Build and push Docker image
+    - name: Build and Push Docker Image
       run: |
         docker build -t ghcr.io/deepuprajapati/deepak-frontend:latest .
         docker push ghcr.io/deepuprajapati/deepak-frontend:latest
