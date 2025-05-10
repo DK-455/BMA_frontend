@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   build:
@@ -17,17 +16,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/deepuprajapati/deepak-frontend:latest .
+          docker build -t prajapati003/deepak-frontend:latest .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/deepuprajapati/deepak-frontend:latest
+          docker push prajapati003/deepak-frontend:latest
