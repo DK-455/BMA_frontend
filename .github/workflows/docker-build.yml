@@ -1,13 +1,13 @@
-name: Build and Push Docker Image to GHCR
+name: Build, Push & Deploy
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 permissions:
   contents: read
-  packages: write 
+  packages: write
 
 jobs:
   build:
@@ -31,3 +31,18 @@ jobs:
       - name: Push Docker image to GHCR
         run: |
           docker push ghcr.io/deepuprajapat/deepak_frontend:latest
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy to EC2 via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ~/deepak_frontend
+            sudo git pull origin main
+            sudo docker compose pull
+            sudo docker compose down
+            sudo docker compose up -d
+          EOF
