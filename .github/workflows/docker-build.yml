@@ -38,3 +38,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           docker push ghcr.io/${{ env.REPO_LOWER }}:${{ env.SHORT_SHA }}
+
+      - name: Send Slack Notification
+        if: github.ref == 'refs/heads/main'
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Docker Image Successfully Built & Pushed for *${{ github.repository }}* on branch *main* (commit: ${{ env.SHORT_SHA }})\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
