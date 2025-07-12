@@ -42,6 +42,10 @@ jobs:
       - name: Send Slack Notification
         if: github.ref == 'refs/heads/main'
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"✅ Docker Image Successfully Built & Pushed for *${{ github.repository }}* on branch *main* (commit: ${{ env.SHORT_SHA }})\"}" \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
+          BUILD_END=$(date +%s)
+          BUILD_DURATION=$((BUILD_END - BUILD_START))
+          MINUTES=$((BUILD_DURATION / 60))
+          SECONDS=$((BUILD_DURATION % 60))
+          curl -X POST -H 'Content-type: application/json' --data "{
+            \"text\": \":rocket: *Docker Image Build Completed!*\n\n*Repository:* ${{ github.repository }}\n*Branch:* main\n*Commit:* ${{ env.SHORT_SHA }}\n*Docker Image Tag:* ghcr.io/${{ env.REPO_LOWER }}:${{ env.SHORT_SHA }}\n*Build Duration:* ${MINUTES}m ${SECONDS}s\n\n✅ Docker image has been successfully built and pushed.\"
+          }" ${{ secrets.SLACK_WEBHOOK_URL }}
